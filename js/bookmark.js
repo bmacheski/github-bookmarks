@@ -1,6 +1,7 @@
 let username = 'bmacheski';
 let defaultUrl = `https://api.github.com/users/${username}/starred`;
 let newUrl;
+let numPages;
 
 function parseHeader(linkStr) {
   let url;
@@ -25,23 +26,42 @@ function parseHeader(linkStr) {
     return res;
   }, {})
 
-  return { url: url, o: s }
+  return { url: url, o: s };
 }
 
 function ghRequest(cb, num) {
-  let p = newUrl ? `${newUrl}?page=${num}` : defaultUrl
+  let u = newUrl ? `${newUrl}?page=${num}` : defaultUrl;
 
   $.ajax({
-    type: "GET",
-    url: p
+    type: 'GET',
+    url: u
   })
   .done(function(data, status, xhr) {
     let link = xhr.getResponseHeader('Link');
     let res = parseHeader(link);
-    newUrl = `${res.url}`
+
+    numPages = res.o.last;
+    newUrl = res.url;
 
     if (typeof(cb) === 'function') {
       cb(data);
+    }
+
+    if (typeof(num) === 'function') {
+      num();
+    }
+  });
+}
+
+function paginate() {
+  $('#pagination').pagination({
+    itemsOnPage: 30,
+    pages: numPages,
+    cssStyle: 'light-theme',
+    onPageClick: function(num) {
+      let bookmarkList = $('#bookmarks');
+
+      ghRequest(parseBookmarks, num);
     }
   });
 }
@@ -62,22 +82,11 @@ function parseBookmarks(json) {
 };
 
 $(document).ready(() => {
-  ghRequest(parseBookmarks);
+  ghRequest(parseBookmarks, paginate);
 
   $('body').on('click', 'a', function() {
     chrome.tabs.create({ url: $(this).attr('href') });
 
     return false;
   });
-
-  $('#pagination').pagination({
-        itemsOnPage: 30,
-        pages: 10,
-        cssStyle: 'light-theme',
-        onPageClick: function(num) {
-          let bookmarkList = $('#bookmarks');
-
-          ghRequest(parseBookmarks, num)
-        }
-    });
 });
