@@ -1,0 +1,24 @@
+a, a:visited {
+  color: #4078c0;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+a:focus {
+  outline:none;
+}
+
+body {
+  height: 500px;
+  width: 400px;
+  font: sans-serif;
+}
+
+h1, li {
+  border-bottom: 1px solid #eee;
+  font-weight: normal;
+}
+
+.title {
+  list-style: none;
+}
