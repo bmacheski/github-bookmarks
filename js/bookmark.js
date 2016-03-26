@@ -5,28 +5,31 @@ let numPages;
 
 function parseHeader(linkStr) {
   let url;
-  let s = linkStr.split(',').map(function(rel) {
 
-    return rel.split(';').map(function(item, idx) {
-      let hold = item.split(',');
+  if (linkStr) {
+    let s = linkStr.split(',').map(function(rel) {
 
-      if (idx === 0) {
-        if (!url) {
-          url = hold[0].split('?page=')[0].replace('<', '').trim();
+      return rel.split(';').map(function(item, idx) {
+        let hold = item.split(',');
+
+        if (idx === 0) {
+          if (!url) {
+            url = hold[0].split('?page=')[0].replace('<', '').trim();
+          }
+          return hold[0].split('?page=')[1].replace('>', '');
         }
-        return hold[0].split('?page=')[1].replace('>', '');
-      }
-      if (idx === 1) {
-        return hold[0].split('rel="')[1].replace(/\"/g, '');
-      }
-    })
-  }).reduce(function(res, curr) {
-    res[curr[1]] = curr[0];
+        if (idx === 1) {
+          return hold[0].split('rel="')[1].replace(/\"/g, '');
+        }
+      })
+    }).reduce(function(res, curr) {
+      res[curr[1]] = curr[0];
 
-    return res;
-  }, {})
+      return res;
+    }, {})
 
-  return { url: url, o: s };
+    return { url: url, o: s };
+  }
 }
 
 function ghRequest(cb, num) {
@@ -40,8 +43,10 @@ function ghRequest(cb, num) {
     let link = xhr.getResponseHeader('Link');
     let res = parseHeader(link);
 
-    numPages = res.o.last;
-    newUrl = res.url;
+    if (res && res.o) {
+      numPages = res.o.last;
+      newUrl = res.url;
+    }
 
     if (typeof(cb) === 'function') {
       cb(data);
