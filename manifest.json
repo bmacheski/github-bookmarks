@@ -10,6 +10,16 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "https://api.github.com/"
-  ]
+    "storage"
+  ],
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "js/background.js"
+    ]
+  },
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  }
 }
