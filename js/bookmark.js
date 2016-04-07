@@ -75,10 +75,12 @@ $(() => {
     bookmarkList.empty()
 
     $.each(json, (i, el) => {
+      let d = json[i].description.replace(/:.*:/, "")
+
       bookmarkList.append(
         `<li class='title'>
           <a href="${json[i].html_url}">${json[i].name}</a>
-          <p>${json[i].description}</p>
+          <p>${d}</p>
         </li>`
       )
     })
